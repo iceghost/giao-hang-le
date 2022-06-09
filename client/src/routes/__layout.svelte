@@ -38,7 +38,8 @@
         <div
             class="mt-5 flex-grow border-b w-full text-lg space-y-2 text-gray-700"
         >
-            <p
+            <a
+                href="/dashboard"
                 class="flex items-center space-x-2 py-2 bg-gray-200 rounded-md px-2"
             >
                 <!-- prettier-ignore -->
@@ -46,8 +47,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span>Danh sách đơn hàng</span>
-            </p>
-            <p
+            </a>
+            <a
+                href="/dashboard/dat-hang"
                 class="flex items-center space-x-2 py-2 hover:bg-gray-100 rounded-md px-2 group"
             >
                 <!-- prettier-ignore -->
@@ -55,7 +57,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
                 <span>Đặt hàng</span>
-            </p>
+            </a>
         </div>
         <p class="mt-5 flex items-center space-x-2">
             <!-- prettier-ignore -->

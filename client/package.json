@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^7.1.0",
+    "@rgossiaux/svelte-headlessui": "^1.0.2",
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/kit": "next",
     "autoprefixer": "^10.4.4",

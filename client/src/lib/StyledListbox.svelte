@@ -1,0 +1,67 @@
+<script lang="ts">
+    import {
+        Listbox,
+        ListboxButton,
+        ListboxOptions,
+        ListboxOption,
+    } from "@rgossiaux/svelte-headlessui";
+
+    type Item = {
+        name_with_type: string;
+    };
+
+    export let items: Promise<Array<Item>> | null;
+
+    export let item: Item | undefined;
+
+    let disabled: boolean = true;
+
+    $: {
+        disabled = true;
+        item = undefined;
+        items && items.then(() => (disabled = false));
+    }
+</script>
+
+<Listbox
+    value={item}
+    on:change={(e) => (item = e.detail)}
+    class="relative w-full"
+    bind:disabled
+>
+    <ListboxButton
+        class="w-full h-10 rounded-md bg-gray-100 flex justify-center items-center {disabled
+            ? 'cursor-not-allowed'
+            : ''}"
+    >
+        {#await items}
+            <!-- prettier-ignore -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 animate-spin" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+        </svg>
+        {:then}
+            {#if item}
+                <span>
+                    {item.name_with_type}
+                </span>
+            {:else if !disabled}
+                <span> --- </span>
+            {/if}
+        {/await}
+    </ListboxButton>
+    {#if items}
+        {#await items then items}
+            <ListboxOptions
+                class="absolute max-h-60 w-full overflow-auto mt-1 bg-white border shadow-sm rounded-md"
+            >
+                {#each items as item}
+                    <ListboxOption value={item} let:active>
+                        <div class="px-2 py-1" class:bg-gray-100={active}>
+                            {item.name_with_type}
+                        </div>
+                    </ListboxOption>
+                {/each}
+            </ListboxOptions>
+        {/await}
+    {/if}
+</Listbox>
