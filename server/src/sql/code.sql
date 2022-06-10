@@ -361,6 +361,18 @@ BEGIN
 
 END;
 
+CREATE FUNCTION GIAO_HANG_LE.Tong_Doanh_Thu(@thang INT, @nam INT)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @income INT;
+    SELECT @income = SUM(gia_tien)
+    FROM GIAO_HANG_LE.DON_HANG
+    WHERE @thang = MONTH(thoi_gian) AND @nam = YEAR(thoi_gian)
+    RETURN @income;
+END;
+GO
+
 
 
 SELECT * FROM GIAO_HANG_LE.TAI_KHOAN;
