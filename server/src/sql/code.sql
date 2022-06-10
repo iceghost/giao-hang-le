@@ -273,6 +273,94 @@ BEGIN
 	END;
 END;
 
+--1.2.1
+CREATE PROCEDURE Them_Tai_Khoan @ten_dang_nhap VARCHAR(32), @mat_khau VARCHAR(32)
+AS
+BEGIN
+    DECLARE @dp INT;
+
+    SELECT @dp = COUNT(*)
+    FROM GIAO_HANG_LE.TAI_KHOAN AS tk
+    WHERE @ten_dang_nhap = tk.ten_dang_nhap;
+
+    IF (@dp <> 0)
+    BEGIN
+		RAISERROR('Ten tai khoan da ton tai, vui long chon mot ten dang nhap khac!', 16, 1);
+		RETURN;
+    END;
+
+    DECLARE @len INT;
+    SELECT @len = LEN(@mat_khau);
+
+    IF (@len < 6)
+    BEGIN
+		RAISERROR('Mat khau qua ngan, vui long chon mat khau dai hon!', 16, 1);
+		RETURN;
+    END;
+
+    INSERT INTO GIAO_HANG_LE.TAI_KHOAN VALUES (@ten_dang_nhap, @mat_khau, 0);
+
+END;
+
+CREATE PROCEDURE Thay_Doi_Mat_Khau @ten_tai_khoan VARCHAR(32), @mat_khau VARCHAR(32), @mat_khau_moi VARCHAR(32)
+AS
+BEGIN
+    DECLARE @mk VARCHAR(32);
+
+    SELECT @mk = tk.mat_khau
+    FROM GIAO_HANG_LE.TAI_KHOAN as tk
+    WHERE @ten_tai_khoan = tk.ten_dang_nhap;
+
+    IF (@mk IS NULL)
+    BEGIN
+		RAISERROR('Tai khoan khong ton tai!', 16, 1);
+		RETURN;
+    END;
+
+    IF (@mk <> @mat_khau)
+    BEGIN
+		RAISERROR('Mat khau cu khong dung!', 16, 1);
+		RETURN;
+    END;
+
+    IF (LEN(@mat_khau_moi) < 6)
+    BEGIN
+		RAISERROR('Mat khau qua ngan, vui long chon mat khau dai hon!', 16, 1);
+		RETURN;
+    END;
+
+    UPDATE GIAO_HANG_LE.TAI_KHOAN
+    SET mat_khau = @mat_khau_moi
+    WHERE ten_dang_nhap = @ten_tai_khoan;
+
+END;
+
+CREATE PROCEDURE Xoa_Tai_Khoan @ten_tai_khoan VARCHAR(32), @mat_khau VARCHAR(32)
+AS
+BEGIN
+    DECLARE @mk VARCHAR(32);
+
+    SELECT @mk = tk.mat_khau
+    FROM GIAO_HANG_LE.TAI_KHOAN as tk
+    WHERE @ten_tai_khoan = tk.ten_dang_nhap;
+
+    IF (@mk IS NULL)
+    BEGIN
+        RAISERROR('Tai khoan khong ton tai!', 16, 1);
+		RETURN;
+    END;
+
+    IF (@mk <> @mat_khau)
+    BEGIN
+        RAISERROR('Mat khau khong dung!', 16, 1);
+		RETURN;
+    END;
+
+    DROP FROM TABLE GIAO_HANG_LE.TAI_KHOAN AS tk
+    WHERE tk.ten_dang_nhap = @ten_tai_khoan;
+
+END;
+
 
 
 SELECT * FROM GIAO_HANG_LE.TAI_KHOAN;
