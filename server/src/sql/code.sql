@@ -393,3 +393,104 @@ SELECT * FROM  GIAO_HANG_LE.GIAO_DI;
 SELECT * FROM GIAO_HANG_LE.NGUOINHAN;
 SELECT * FROM GIAO_HANG_LE.GIAO_DEN_KHO;
 SELECT * FROM GIAO_HANG_LE.DEN_KHO AS A, GIAO_HANG_LE.ROI_KHO AS B WHERE A.ma_thung = B.ma_thung;
+GO
+
+
+CREATE FUNCTION GIAO_HANG_LE.Tien_Trinh_Don_Hang(
+    @no INT
+)
+RETURNS @Chi_Tiet TABLE (
+	thong_tin VARCHAR(128)
+)
+AS
+BEGIN
+    -- Input validation
+    DECLARE @valid SMALLINT;
+    SELECT @valid = COUNT(*)
+    FROM GIAO_HANG_LE.DON_HANG AS dh
+    WHERE dh.ma_don_hang = @no;
+
+    IF (@valid = 0)
+    BEGIN
+		RETURN;
+    END;
+
+    IF (@valid <> 1)
+    BEGIN
+        RETURN;
+    END;
+
+    -- @valid = 1 => the order exists and is unique
+
+    DECLARE @len INT;
+    SELECT @len = 0;
+
+    DECLARE @new_len INT;
+    SET @new_len = 0;
+
+    INSERT INTO @Chi_Tiet
+    SELECT CAST(
+        CASE WHEN thanh_cong = 1 
+            THEN 'Lay hang thanh cong luc ' + CONVERT(nvarchar(max), thoi_gian) + ' .'
+            ELSE 'Lay hang that bai luc ' + CONVERT(nvarchar(max), thoi_gian) +  ' . Ly do: ' + ly_do
+	    END AS VARCHAR(128)
+    )
+    FROM GIAO_HANG_LE.GIAO_DI
+    WHERE ma_don_hang = @no;
+
+    SELECT @new_len = COUNT(*) FROM @Chi_Tiet;
+    IF (@len = @new_len)
+    BEGIN
+        INSERT INTO @Chi_Tiet VALUES (
+            'Don hang dang duoc chuan bi.'
+        )
+        RETURN;
+    END;
+
+    SELECT @len = @new_len;
+    
+    DECLARE @di_chuyen TABLE(
+        da_roi_kho INT,
+        thoi_gian_di DATETIME,
+        da_den_kho INT,
+        thoi_gian_den DATETIME
+    )
+
+    INSERT INTO @di_chuyen
+    SELECT
+    CAST(
+        CASE WHEN rk.ma_thung IS NOT NULL
+            THEN c.kho_bat_dau
+            ELSE -1
+        END AS INT
+    ) as da_roi_kho,
+    CONVERT(DATETIME, rk.thoi_gian_di),
+    CAST(
+        CASE WHEN dk.ma_thung IS NOT NULL
+            THEN c.kho_ket_thuc
+            ELSE -1
+        END AS INT
+    ) as da_den_kho,
+    CONVERT(DATETIME, dk.thoi_gian_den)
+    FROM GIAO_HANG_LE.DONG_GOI as dg, GIAO_HANG_LE.CHANG as c, GIAO_HANG_LE.THUNG_HANG as th, GIAO_HANG_LE.ROI_KHO as rk, GIAO_HANG_LE.DEN_KHO as dk
+    WHERE dg.ma_don_hang = @no AND dg.ma_thung_hang = th.ma_thung_hang AND th.ma_chang = c.ma_chang AND dg.ma_thung_hang = rk.ma_thung AND dg.ma_thung_hang = dk.ma_thung
+
+    INSERT INTO @Chi_Tiet
+    SELECT
+    CAST(
+        CASE WHEN da_roi_kho <> -1
+            THEN 'Don hang da roi kho ' + (SELECT ten_kho_hang FROM GIAO_HANG_LE.KHO_HANG WHERE da_roi_kho = ma_kho_hang) + ' vao luc ' + CONVERT(NVARCHAR(MAX), thoi_gian_di) + CHAR(10)
+            ELSE ''
+        END AS VARCHAR(128)
+    ) + 
+    CAST(
+        CASE WHEN da_den_kho <> -1
+            THEN 'Don hang da roi kho ' + (SELECT ten_kho_hang FROM GIAO_HANG_LE.KHO_HANG WHERE da_den_kho = ma_kho_hang) + ' vao luc ' + CONVERT(NVARCHAR(MAX), thoi_gian_den) + CHAR(10)
+            ELSE ''
+        END AS VARCHAR(128)
+    )
+    FROM @di_chuyen;
+
+	RETURN;
+END;
+GO
