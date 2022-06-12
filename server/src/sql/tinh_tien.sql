@@ -32,9 +32,9 @@ BEGIN
             FROM ch)
         )
     SELECT @sum = (CASE
-                    WHEN @trong_luong >= 10 THEN 1 * duoi_1kg + 10 * duoi_10kg + (@trong_luong - 10) * tren_10kg
-                    WHEN @trong_luong >= 1 THEN 1 * duoi_1kg + (@trong_luong - 1) * duoi_10kg
-                    ELSE @trong_luong * duoi_1kg
+                    WHEN @trong_luong >= 10 THEN (@trong_luong - 10) * tren_10kg
+                    WHEN @trong_luong >= 1 THEN duoi_10kg
+                    ELSE duoi_1kg
                     END)
     FROM don_gia;
 
