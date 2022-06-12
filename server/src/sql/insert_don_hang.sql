@@ -1,0 +1,9 @@
+DELETE FROM GIAO_HANG_LE.DON_HANG;
+DBCC CHECKIDENT ('GIAO_HANG_LE.DON_HANG', RESEED, -1);
+INSERT INTO GIAO_HANG_LE.DON_HANG (ma_khach_hang, trong_luong, can_giao_di, dia_chi_di, dia_chi_den) VALUES (1, 1.2, 1, '34 Phan Van Tri, Quan Go Vap, Thanh pho Ho Chi Minh', '03 Nguyen Gia Thieu, Phuong 12, Quan 3, Thanh pho Ho Chi Minh');
+INSERT INTO GIAO_HANG_LE.DON_HANG (ma_khach_hang, trong_luong, can_giao_di, dia_chi_di, dia_chi_den) VALUES (1, 3.8, 1, '497 Hoa Hao, Phuong 07, Quan 10, Thanh pho Ho Chi Minh', '39A Luy Ban Bich, Khu pho An Lac, Thi tran Phuoc Hai, Huyen Dat Do, Tinh Ba Ria Vung Tau');
+INSERT INTO GIAO_HANG_LE.DON_HANG (ma_khach_hang, trong_luong, can_giao_di, dia_chi_di, dia_chi_den) VALUES (6, 8.7, 0, '639 Hoang Hoa Tham, Quan Ba Dinh, Ha Noi', '347 Huynh Van Banh, Phuong 11, Quan Phu Nhuan, Thanh pho Ho Chi Minh');
+INSERT INTO GIAO_HANG_LE.DON_HANG (ma_khach_hang, trong_luong, can_giao_di, dia_chi_di, dia_chi_den) VALUES (3, 0.6, 1, 'Ky tuc xa khu A, Phuong Linh Trung, Thanh pho Thu Duc, Thanh pho Ho Chi Minh', 'FC42+6QP, Xa My Tinh An, Huyen Cho Gao, Tinh Tien Giang');
+INSERT INTO GIAO_HANG_LE.DON_HANG (ma_khach_hang, trong_luong, can_giao_di, dia_chi_di, dia_chi_den) VALUES (5, 5.3, 0, '473 Nguyen An Ninh, Phuong 9, Thanh pho Vung Tau, Tinh Ba Ria Vung Tau', '20 Huynh Tinh Cua, Quan 3, Thanh pho Ho Chi Minh');
+INSERT INTO GIAO_HANG_LE.DON_HANG (ma_khach_hang, trong_luong, can_giao_di, dia_chi_di, dia_chi_den) VALUES (8, 9.5, 1, '12 Be Van Dan, Phuong Tan Thanh, Thanh pho Buon Ma Thuot, Tinh Dak Lak', '52B Nguyen Van Troi, Phuong 15, Quan Phu Nhuan, Thanh pho Ho Chi Minh');
+SELECT * FROM GIAO_HANG_LE.DON_HANG;
