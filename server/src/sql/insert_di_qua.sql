@@ -1,4 +1,5 @@
-DELETE FROM GIAO_HANG_LE.DI_QUA
+DELETE FROM GIAO_HANG_LE.DI_QUA;
+GO
 INSERT INTO GIAO_HANG_LE.DI_QUA
 VALUES
     (0, 333, 1),
@@ -15,4 +16,5 @@ VALUES
     (4, 214, 3),
     (5, 30, 1),
     (5, 28, 2),
-    (5, 213, 3);
+    (5, 213, 3)
+GO

@@ -2,7 +2,9 @@ DROP FUNCTION IF EXISTS GIAO_HANG_LE.Tinh_Tien_Mot_Chang;
 GO
 CREATE FUNCTION GIAO_HANG_LE.Tinh_Tien_Mot_Chang(
     @trong_luong FLOAT,
-    @ma_chang INT
+    @phi_duoi_1kg INT,
+    @phi_duoi_10kg INT,
+    @phi_tren_10kg INT
 )
 RETURNS FLOAT
 AS
@@ -10,13 +12,11 @@ BEGIN
     DECLARE @sum FLOAT
 
     SELECT @sum = (CASE
-                    WHEN @trong_luong >= 10 THEN (@trong_luong - 10) * phi_tren_10kg
-                    WHEN @trong_luong >= 1 THEN phi_duoi_10kg
-                    ELSE phi_duoi_1kg
-                    END)
-    FROM GIAO_HANG_LE.CHANG
+        WHEN @trong_luong >= 10 THEN (@trong_luong - 10) * @phi_tren_10kg
+        WHEN @trong_luong >= 1 THEN @phi_duoi_10kg
+        ELSE @phi_duoi_1kg
+    END)
 
-    WHERE ma_chang = @ma_chang;
     RETURN @sum
 END
 GO
@@ -26,25 +26,42 @@ GO
 CREATE TRIGGER GIAO_HANG_LE.Tinh_Tien ON GIAO_HANG_LE.DI_QUA
 FOR INSERT, UPDATE, DELETE
 AS
-
-
+    WITH
+    tang_them
+    AS
+    (
+        SELECT ma_don_hang,
+            SUM(phi_duoi_1kg) as duoi_1kg,
+            SUM(phi_duoi_10kg) as duoi_10kg,
+            SUM(phi_tren_10kg) as tren_10kg
+        FROM CHANG, inserted
+        WHERE CHANG.ma_chang = inserted.ma_chang
+        GROUP BY ma_don_hang
+    ),
+    giam_xuong
+    AS
+    (
+        SELECT ma_don_hang,
+            SUM(phi_duoi_1kg) as duoi_1kg,
+            SUM(phi_duoi_10kg) as duoi_10kg,
+            SUM(phi_tren_10kg) as tren_10kg
+        FROM CHANG, deleted
+        WHERE CHANG.ma_chang = deleted.ma_chang
+        GROUP BY ma_don_hang
+    ),
+    tong_cong
+    AS
+    (
+        SELECT t.ma_don_hang,
+            ISNULL(t.duoi_1kg, 0) - ISNULL(g.duoi_1kg, 0) as duoi_1kg,
+            ISNULL(t.duoi_10kg, 0) - ISNULL(g.duoi_10kg, 0) as duoi_10kg,
+            ISNULL(t.tren_10kg, 0) - ISNULL(g.tren_10kg, 0) as tren_10kg
+        FROM tang_them as t FULL OUTER JOIN giam_xuong as g
+            ON t.ma_don_hang = g.ma_don_hang
+    )
     UPDATE DON_HANG
-    SET gia_tien = gia_tien + i.sum
-    FROM DON_HANG as dh, (
-        SELECT inserted.ma_don_hang, SUM(GIAO_HANG_LE.Tinh_Tien_Mot_Chang(trong_luong, ma_chang)) as sum
-    FROM inserted, DON_HANG as dh
-    WHERE inserted.ma_don_hang = dh.ma_don_hang
-    GROUP BY inserted.ma_don_hang
-    ) as i
-    WHERE dh.ma_don_hang = i.ma_don_hang;
-
-    UPDATE DON_HANG
-    SET gia_tien = gia_tien - i.sum
-    FROM DON_HANG as dh, (
-        SELECT deleted.ma_don_hang, SUM(GIAO_HANG_LE.Tinh_Tien_Mot_Chang(trong_luong, ma_chang)) as sum
-    FROM deleted, DON_HANG as dh
-    WHERE deleted.ma_don_hang = dh.ma_don_hang
-    GROUP BY deleted.ma_don_hang
-    ) as i
-    WHERE dh.ma_don_hang = i.ma_don_hang;
+    SET gia_tien = gia_tien
+        + GIAO_HANG_LE.Tinh_Tien_Mot_Chang(trong_luong, duoi_1kg, duoi_10kg, tren_10kg)
+    FROM DON_HANG, tong_cong
+    WHERE DON_HANG.ma_don_hang = tong_cong.ma_don_hang
 GO
