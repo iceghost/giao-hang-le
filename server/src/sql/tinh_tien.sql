@@ -1,43 +1,38 @@
-DROP FUNCTION IF EXISTS GIAO_HANG_LE.Tinh_Tien;
+DROP FUNCTION IF EXISTS GIAO_HANG_LE.Tinh_Tien_Mot_Chang;
 GO
-CREATE FUNCTION GIAO_HANG_LE.Tinh_Tien(
-    @no INT
+CREATE FUNCTION GIAO_HANG_LE.Tinh_Tien_Mot_Chang(
+    @trong_luong FLOAT,
+    @ma_chang INT
 )
 RETURNS FLOAT
 AS
 BEGIN
-    DECLARE @sum FLOAT, @trong_luong FLOAT;
+    DECLARE @sum FLOAT
 
-    SELECT @trong_luong = trong_luong
-    FROM DON_HANG
-    where ma_don_hang = @no;
-
-    WITH
-        ch
-        AS
-        (
-            SELECT ma_chang
-            from DI_QUA
-            WHERE ma_don_hang = @no
-        ),
-        don_gia
-        AS
-        (
-            SELECT
-                SUM(phi_duoi_1kg) AS duoi_1kg,
-                SUM(phi_duoi_10kg) AS duoi_10kg,
-                SUM(phi_tren_10kg) AS tren_10kg
-            FROM CHANG
-            WHERE ma_chang IN (SELECT *
-            FROM ch)
-        )
     SELECT @sum = (CASE
-                    WHEN @trong_luong >= 10 THEN (@trong_luong - 10) * tren_10kg
-                    WHEN @trong_luong >= 1 THEN duoi_10kg
-                    ELSE duoi_1kg
+                    WHEN @trong_luong >= 10 THEN (@trong_luong - 10) * phi_tren_10kg
+                    WHEN @trong_luong >= 1 THEN phi_duoi_10kg
+                    ELSE phi_duoi_1kg
                     END)
-    FROM don_gia;
+    FROM GIAO_HANG_LE.CHANG
 
-    RETURN @sum;
+    WHERE ma_chang = @ma_chang;
+    RETURN @sum
 END
+GO
+
+DROP TRIGGER IF EXISTS GIAO_HANG_LE.Tinh_Tien;
+GO
+CREATE TRIGGER GIAO_HANG_LE.Tinh_Tien ON GIAO_HANG_LE.DI_QUA
+FOR INSERT, UPDATE, DELETE
+AS
+    UPDATE DON_HANG
+    SET gia_tien = gia_tien + GIAO_HANG_LE.Tinh_Tien_Mot_Chang(trong_luong, ma_chang)
+    FROM DON_HANG as dh, inserted as i
+    WHERE dh.ma_don_hang = i.ma_don_hang;
+
+    UPDATE DON_HANG
+    SET gia_tien = gia_tien - GIAO_HANG_LE.Tinh_Tien_Mot_Chang(trong_luong, ma_chang)
+    FROM DON_HANG as dh, deleted as d
+    WHERE dh.ma_don_hang = d.ma_don_hang;
 GO
