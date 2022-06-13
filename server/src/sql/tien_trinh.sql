@@ -40,10 +40,10 @@ BEGIN
 
     INSERT INTO @Chi_Tiet
     SELECT
-        thoi_gian,
-        'Giao den kho' as thong_tin
-    FROM GIAO_DEN_KHO
-    WHERE ma_don_hang = @no;
+        GIAO_DEN_KHO.thoi_gian,
+        'Giao den kho '  + GIAO_HANG_LE.KHO_HANG.ten_kho_hang as thong_tin
+    FROM GIAO_DEN_KHO, GIAO_HANG_LE.KHO_HANG, GIAO_HANG_LE.KIEM_KHO
+    WHERE ma_don_hang = @no AND GIAO_HANG_LE.GIAO_DEN_KHO.ma_kiem_kho = GIAO_HANG_LE.KIEM_KHO.ma_nhan_vien AND GIAO_HANG_LE.KIEM_KHO.ma_so_kho = GIAO_HANG_LE.KHO_HANG.ma_kho_hang;
 
     WITH
         th
@@ -56,18 +56,16 @@ BEGIN
         luot_roi_kho
         AS
         (
-            SELECT rk.thoi_gian_di as thoi_gian, 'Roi kho' as thong_tin
-            FROM ROI_KHO as rk
-            WHERE rk.ma_thung IN (SELECT ma_thung_hang
-            FROM th)
+            SELECT rk.thoi_gian_di as thoi_gian, 'Roi kho ' + GIAO_HANG_LE.KHO_HANG.ten_kho_hang as thong_tin
+            FROM ROI_KHO as rk, GIAO_HANG_LE.KHO_HANG, GIAO_HANG_LE.KIEM_KHO
+            WHERE rk.ma_thung IN (SELECT ma_thung_hang FROM th) AND rk.ma_kiem_kho = GIAO_HANG_LE.KIEM_KHO.ma_nhan_vien AND GIAO_HANG_LE.KIEM_KHO.ma_so_kho = GIAO_HANG_LE.KHO_HANG.ma_kho_hang
         ),
         luot_den_kho
         AS
         (
-            SELECT dk.thoi_gian_den as thoi_gian, 'Den kho' as thong_tin
-            FROM DEN_KHO as dk, th
-            WHERE dk.ma_thung IN (SELECT ma_thung_hang
-            FROM th)
+            SELECT dk.thoi_gian_den as thoi_gian, 'Den kho ' + GIAO_HANG_LE.KHO_HANG.ten_kho_hang as thong_tin
+            FROM DEN_KHO as dk, th, GIAO_HANG_LE.KHO_HANG, GIAO_HANG_LE.KIEM_KHO
+            WHERE dk.ma_thung IN (SELECT ma_thung_hang FROM th) AND dk.ma_kiem_kho = GIAO_HANG_LE.KIEM_KHO.ma_nhan_vien AND GIAO_HANG_LE.KIEM_KHO.ma_so_kho = GIAO_HANG_LE.KHO_HANG.ma_kho_hang
         )
     INSERT INTO @Chi_Tiet
             SELECT *
@@ -89,3 +87,5 @@ BEGIN
     RETURN;
 END;
 GO
+
+SELECT * FROM GIAO_HANG_LE.Tien_Trinh_Don_Hang(4);
