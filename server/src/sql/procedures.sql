@@ -25,7 +25,7 @@ BEGIN
         FROM TAI_XE
         WHERE ma_tai_xe = @ma_nhan_vien
     END
-    SELECT @ma_khach_hang, @ma_kiem_kho, @ma_tai_xe
+    SELECT @ma_khach_hang AS  ma_khach_hang, @ma_kiem_kho AS ma_kiem_kho, @ma_tai_xe AS ma_tai_xe
 END
 GO
 
@@ -101,7 +101,7 @@ END;
 
 GO
 
-CREATE OR ALTER PROCEDURE Xoa_Tai_Khoan
+CREATE OR ALTER PROCEDURE GIAO_HANG_LE.Xoa_Tai_Khoan
     @ten_tai_khoan VARCHAR(32),
     @mat_khau VARCHAR(32)
 AS
@@ -130,7 +130,7 @@ BEGIN
 END;
 
 GO
-CREATE PROCEDURE GIAO_HANG_LE.Dong_Goi
+CREATE PROCEDURE GIAO_HANG_LE.Dong_Goi_Don_Hang
     @no INT,
     @ma_kiem_kho INT
 AS

@@ -9,9 +9,8 @@ BEGIN
     RETURN @income;
 END;
 
-DROP FUNCTION IF EXISTS GIAO_HANG_LE.Tien_Trinh_Don_Hang;
-GO
-CREATE FUNCTION GIAO_HANG_LE.Tien_Trinh_Don_Hang(
+
+CREATE OR ALTER FUNCTION GIAO_HANG_LE.Tien_Trinh_Don_Hang(
     @no INT
 )
 RETURNS @Chi_Tiet TABLE (
