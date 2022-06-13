@@ -1,26 +1,3 @@
-DROP FUNCTION IF EXISTS GIAO_HANG_LE.Tinh_Tien_Mot_Chang;
-GO
-CREATE FUNCTION GIAO_HANG_LE.Tinh_Tien_Mot_Chang(
-    @trong_luong FLOAT,
-    @phi_duoi_1kg INT,
-    @phi_duoi_10kg INT,
-    @phi_tren_10kg INT
-)
-RETURNS FLOAT
-AS
-BEGIN
-    DECLARE @sum FLOAT
-
-    SELECT @sum = (CASE
-        WHEN @trong_luong >= 10 THEN (@trong_luong - 10) * @phi_tren_10kg
-        WHEN @trong_luong >= 1 THEN @phi_duoi_10kg
-        ELSE @phi_duoi_1kg
-    END)
-
-    RETURN @sum
-END
-GO
-
 DROP TRIGGER IF EXISTS GIAO_HANG_LE.Tinh_Tien;
 GO
 CREATE TRIGGER GIAO_HANG_LE.Tinh_Tien ON GIAO_HANG_LE.DI_QUA
