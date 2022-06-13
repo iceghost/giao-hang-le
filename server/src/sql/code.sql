@@ -223,3 +223,33 @@ BEGIN
 END;
 
 GO
+CREATE PROCEDURE GIAO_HANG_LE.Dong_Goi
+    @no INT,
+    @ma_kiem_kho INT
+AS
+BEGIN
+    DECLARE @ma_so_kho INT;
+    SELECT @ma_so_kho = ma_so_kho
+    FROM GIAO_HANG_LE.KIEM_KHO
+    WHERE @ma_kiem_kho = ma_nhan_vien
+
+    DECLARE @ma_chang INT;
+    SELECT @ma_chang = ma_chang
+    FROM GIAO_HANG_LE.CHANG
+    WHERE kho_bat_dau = @ma_so_kho;
+
+    DECLARE @ma_thung_hang INT;
+    SELECT @ma_thung_hang = ma_thung_hang
+    FROM GIAO_HANG_LE.THUNG_HANG
+    WHERE ma_chang = @ma_chang;
+
+    IF @ma_thung_hang IS NULL
+    BEGIN
+        INSERT INTO GIAO_HANG_LE.THUNG_HANG(ma_chang) VALUES (@ma_chang);
+        SELECT @ma_thung_hang = ma_thung_hang
+        FROM GIAO_HANG_LE.THUNG_HANG
+        WHERE ma_chang = @ma_chang;
+    END;
+
+    INSERT INTO GIAO_HANG_LE.DONG_GOI(ma_don_hang, ma_thung_hang, ma_kiem_kho) VALUES (@no, @ma_thung_hang, @ma_kiem_kho);
+END;
